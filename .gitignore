@@ -1,4 +1,4 @@
-```gitignore
+gitignore
 # Dependencies
 node_modules/
 
@@ -43,4 +43,3 @@ temp/
 
 # Docker
 docker-compose.override.yml
-```

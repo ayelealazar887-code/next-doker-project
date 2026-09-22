@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -16,7 +16,52 @@ datasource db {
 
 
 model User {
-  id      Int     @id @default(autoincrement())
-  name    String
-  email   String
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  orders    Order[]
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal     @db.Decimal(10, 2)
+  stock       Int
+  createdAt   DateTime    @default(now())
+
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  userId     Int
+  total      Decimal     @db.Decimal(10, 2)
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+
+  user       User        @relation(fields: [userId], references: [id])
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  COMPLETED
 }
