@@ -1,4 +1,5 @@
 services:
+
   postgres:
     image: postgres:latest
     container_name: dbyml
@@ -13,6 +14,33 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser -d dbnext"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+
+    container_name: backend
+
+    ports:
+      - "5000:5000"
+
+    env_file:
+      - ./server/.env
+
+    depends_on:
+      postgres:
+        condition: service_healthy
 
     restart: unless-stopped
 
