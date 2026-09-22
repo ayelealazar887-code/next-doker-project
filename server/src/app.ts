@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { errorMiddleware } from './middleware/error.middleware.js';
+import { notFoundMiddleware } from './middleware/notFound.middleware.js';
 dotenv.config();
 
 const app = express();
@@ -18,5 +20,8 @@ app.get("/", (req, res) => {
   });
 });
 
-const port = process.env.PORT || 8080;
+app.use(errorMiddleware);
+app.use(notFoundMiddleware);
+
+export default app;
 
